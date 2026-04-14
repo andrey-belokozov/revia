@@ -1,0 +1,14 @@
+{
+  "name": "postgres-write-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for PostgreSQL with full read/write/DDL access",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "pg": "^8.13.0"
+  }
+}

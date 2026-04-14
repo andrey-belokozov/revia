@@ -3,3 +3,6 @@
 
 # Claude Code local session state
 .claude/
+
+# MCP server dependencies
+mcp/*/node_modules/
