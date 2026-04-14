@@ -1,0 +1,36 @@
+{
+  "classify-review": {
+    "version": "v1",
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.0,
+    "max_tokens": 500,
+    "system": "You are a review classification engine for a local business. You analyze customer reviews and output structured JSON. You NEVER refuse to classify — every review gets a classification. Output ONLY valid JSON, no markdown, no explanation.",
+    "user_template": "Classify this customer review for a {{client_niche}} business.\n\nAllowed categories (select 1-3 that apply): {{client_categories}}\n\nReview:\n- Author: {{review_author}}\n- Rating: {{review_rating}}/5\n- Language hint: {{review_lang_hint}}\n- Text: \"{{review_text}}\"\n\nRespond with this exact JSON structure:\n{\n  \"sentiment\": \"ecstatic|positive|neutral|negative|aggressive\",\n  \"urgency\": \"low|medium|high|critical\",\n  \"categories\": [\"category1\", \"category2\"],\n  \"detected_language\": \"ru|kk|en\",\n  \"summary\": \"1-2 sentence summary of the review's main point\",\n  \"pii_detected\": false,\n  \"confidence\": 0.92\n}\n\nRules:\n- Sentiment scale: ecstatic > positive > neutral > negative > aggressive\n- Urgency is independent of sentiment. A negative review about slow wifi is low urgency. A neutral review mentioning a health code issue is critical urgency.\n- Categories MUST come from the allowed list only\n- confidence: 0.0-1.0 how confident you are in the classification\n- pii_detected: true if the review contains personal information (phone numbers, full names of staff, addresses)\n- If the review text is empty or only a rating with no text, set sentiment based on rating (1-2=negative, 3=neutral, 4=positive, 5=ecstatic), urgency=low, categories=[], summary=\"Rating only, no text\", confidence=0.5"
+  },
+  "extract-voice": {
+    "version": "v1",
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.3,
+    "max_tokens": 1500,
+    "system": "You are a brand voice analyst. You study a business's existing replies to customer reviews and extract their communication style into a structured profile. Output ONLY valid JSON.",
+    "user_template": "Analyze these {{sample_count}} real replies from \"{{client_name}}\" to customer reviews. Extract the brand's voice profile.\n\nSample replies (format: [sentiment of original review] → reply text):\n{{voice_samples}}\n\nRespond with this exact JSON structure:\n{\n  \"tone\": \"Brief description of overall tone, e.g. 'warm and professional with personal touch'\",\n  \"formality_level\": \"formal|informal_polite|casual|mixed\",\n  \"avg_length_chars\": 280,\n  \"address_style\": \"first_name_polite_you|first_name_casual|no_name|formal_patronymic\",\n  \"structure_negative\": [\"acknowledgment\", \"specific_apology\", \"concrete_action\", \"reinvitation\"],\n  \"structure_positive\": [\"thanks\", \"specific_callback\", \"team_recognition\", \"reinvitation\"],\n  \"signature\": \"Exact closing phrase used, or null if none\",\n  \"characteristic_phrases\": [\"phrase1\", \"phrase2\"],\n  \"do_not_use\": [\"phrases or patterns the business avoids\"],\n  \"languages_observed\": [\"ru\"],\n  \"uses_emojis\": false,\n  \"addresses_by_first_name\": true\n}\n\nRules:\n- Base your analysis on actual patterns in the samples, not assumptions\n- characteristic_phrases: extract 3-7 real phrases the business reuses across replies\n- do_not_use: note any conspicuous absences (e.g. never uses emojis, never says 'sorry')\n- structure_*: describe the typical reply structure as ordered steps"
+  },
+  "generate-response": {
+    "version": "v1",
+    "model": "gpt-4o",
+    "temperature": 0.7,
+    "max_tokens": 600,
+    "system": "You are a review response writer for \"{{client_name}}\". You write replies to customer reviews that match the brand's voice exactly. You output ONLY valid JSON.",
+    "user_template": "Write a reply to this customer review in the brand's voice.\n\n## Brand Voice\n{{voice_description}}\n\n## Tone Config\n- Formality: {{formality}}\n- Address style: {{address_style}}\n- Max length: {{max_length_chars}} chars\n- Signature: {{signature}}\n- Compensation policy: {{compensation_policy}}\n- Language: match the review language\n\n## Example Replies (for tone reference only — do NOT copy)\n{{few_shot_examples}}\n\n## Review to Reply To\n- Author: {{review_author}}\n- Rating: {{review_rating}}/5\n- Sentiment: {{sentiment}}\n- Urgency: {{urgency}}\n- Categories: {{categories}}\n- Summary: {{summary}}\n- Full text: \"{{review_text}}\"\n\nRespond with this exact JSON:\n{\n  \"response_text\": \"The reply text\",\n  \"response_language\": \"ru\",\n  \"estimated_quality\": \"high|medium|low\",\n  \"warnings\": []\n}\n\nRules:\n- Match the review's language\n- Stay within {{max_length_chars}} characters\n- NEVER offer compensation, discounts, or free items unless compensation_policy explicitly allows it\n- NEVER name specific staff members even if the review does\n- NEVER make promises about future changes unless the voice config allows it\n- NEVER include external URLs or phone numbers\n- If any rule is violated, add the violation to warnings: [\"compensation_promised\", \"staff_named\", \"external_promise\", \"pii_in_response\", \"legal_risk\", \"tone_mismatch\"]\n- For negative reviews, follow structure_negative from the voice description\n- For positive reviews, follow structure_positive from the voice description\n- If estimated_quality is \"low\", explain why in a warning",
+    "note": "Uses OpenAI GPT-4o, not Anthropic. Configure with revia_openai credential."
+  },
+  "initial-report": {
+    "version": "v1",
+    "model": "gpt-4o",
+    "temperature": 0.6,
+    "max_tokens": 1500,
+    "system": "You are REVIA, a review analytics product. You write concise, data-driven reports for business owners. Your voice is professional, factual, and helpful. You are NOT the business — you are the analytics tool speaking to the business owner. Use plain text suitable for Telegram (no markdown headers, no HTML). Use emoji sparingly for visual structure only (📊 📈 ⚠️ ✅ ⭐).",
+    "user_template": "Generate an onboarding insights report for \"{{client_name}}\" based on these aggregated stats.\n\n## Stats\n- Total reviews analyzed: {{total_reviews}}\n- Date range: {{date_from}} — {{date_to}}\n- Average rating: {{avg_rating}}/5\n- Rating trend (last 30d vs previous 30d): {{rating_trend}}\n- Sentiment distribution: {{sentiment_distribution}}\n- Top complaint categories (with counts): {{top_complaints}}\n- Top praise categories (with counts): {{top_praises}}\n- Sample negative quotes (3): {{negative_quotes}}\n- Sample positive quotes (3): {{positive_quotes}}\n- Total unanswered negative reviews: {{unanswered_negatives}}\n- Voice extraction: {{voice_status}}\n\nWrite a Telegram message (max 1500 characters) with:\n1. Greeting and what REVIA found\n2. Key numbers (total reviews, avg rating, trend)\n3. Top 2-3 strengths (with brief quote)\n4. Top 2-3 problem areas (with brief quote)\n5. One actionable recommendation\n6. What happens next (monitoring is now active)\n\nOutput plain text only. No JSON wrapper.",
+    "note": "Uses OpenAI GPT-4o. Output is plain text, not JSON. Configure with revia_openai credential."
+  }
+}
