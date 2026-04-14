@@ -37,7 +37,7 @@ CREATE TABLE app.clients (
   display_name           text NOT NULL,
   niche                  text NOT NULL,
   city                   text NOT NULL,
-  timezone               text NOT NULL DEFAULT 'Asia/Almaty',
+  timezone               text NOT NULL DEFAULT 'Etc/GMT-5',
   status                 app.client_status NOT NULL DEFAULT 'active',
   telegram_chat_id       bigint,
   telegram_bound_at      timestamptz,

@@ -6,7 +6,7 @@
 BEGIN;
 
 INSERT INTO app.clients (slug, display_name, niche, city, timezone, status)
-VALUES ('lou-lou-astana', 'Lou Lou', 'restaurant', 'Астана', 'Asia/Almaty', 'active');
+VALUES ('lou-lou-astana', 'Lou Lou', 'restaurant', 'Астана', 'Etc/GMT-5', 'active');
 
 INSERT INTO app.client_sources (client_id, platform, source_url, status)
 VALUES (
