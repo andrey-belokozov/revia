@@ -12,7 +12,7 @@ INSERT INTO app.client_sources (client_id, platform, source_url, status)
 VALUES (
   (SELECT id FROM app.clients WHERE slug = 'lou-lou-astana'),
   '2gis',
-  '__LOU_LOU_2GIS_URL__',
+  'https://2gis.kz/astana/firm/70000001063404829?m=71.437352%2C51.126496%2F16',
   'active'
 );
 
