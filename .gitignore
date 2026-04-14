@@ -1,0 +1,5 @@
+# MCP config — contains DB credentials and API keys
+.mcp.json
+
+# Claude Code local session state
+.claude/
