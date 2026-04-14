@@ -22,6 +22,9 @@ Every locked-in design decision from the brainstorming phase, with rationale. Th
 **Decision:** Database name `revia_reviews_hub`
 **Why:** Convention `<brand>_<purpose>`. Brand-prefixed to distinguish from personal/experimental/client DBs on the same server.
 
+**Decision:** Timezone stored as `Etc/GMT-5`, not `Asia/Almaty`
+**Why:** Kazakhstan moved to UTC+5 permanently in 2024. `Asia/Almaty` returns UTC+6 on older tzdata versions. `Etc/GMT-5` is a fixed POSIX offset — always UTC+5, no dependency on tzdata version on the server.
+
 **Decision:** Project folder `c:\CursorDev\revia\`
 **Why:** Convention `<brand>` for commercial products. Clean and scalable when second product arrives.
 
