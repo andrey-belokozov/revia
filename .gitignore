@@ -5,4 +5,4 @@
 .claude/
 
 # MCP server dependencies
-mcp/*/node_modules/
+mcp/**/node_modules/
